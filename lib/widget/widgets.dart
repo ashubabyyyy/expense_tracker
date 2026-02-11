@@ -47,8 +47,8 @@ Widget continueButton(VoidCallback onTap) {
           "Continue",
           style: TextStyle(
             fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: Colors.black,
+            fontWeight: FontWeight.w500,
+            color: Colors.white,
           ),
         ),
       ),
