@@ -1,10 +1,12 @@
-import 'package:expense_trackker/widget/widgets.dart';
+import 'package:expense_trackker/views/borrow_screen.dart';
+import 'package:expense_trackker/views/lend_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/balance_viewmodel.dart';
 import '../income/income_screen.dart';
 import '../expense/expense_screen.dart';
 
+import '../widget/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -17,7 +19,7 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xfff2f2f2),
       body: Column(
         children: [
-          
+          // ================= TOP SECTION (UNCHANGED UI) =================
           Container(
             height: 300,
             width: double.infinity,
@@ -32,7 +34,7 @@ class HomeScreen extends StatelessWidget {
                   color: Colors.black26,
                   blurRadius: 10,
                   offset: Offset(0, 5),
-                )
+                ),
               ],
             ),
             child: Column(
@@ -40,12 +42,11 @@ class HomeScreen extends StatelessWidget {
               children: [
                 const Text(
                   "Current Balance",
-                  style: TextStyle(
-                    color: Colors.white70,
-                    fontSize: 18,
-                  ),
+                  style: TextStyle(color: Colors.white70, fontSize: 18),
                 ),
+
                 const SizedBox(height: 10),
+
                 Text(
                   "Rs. ${vm.balance.toStringAsFixed(0)}",
                   style: const TextStyle(
@@ -54,42 +55,81 @@ class HomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+
                 const SizedBox(height: 30),
 
-              
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const IncomeScreen()),
-                        );
-                      },
-                      child: ActionButton(
-                        icon: Icons.arrow_downward,
-                        text: "Income",
-                        color: Colors.greenAccent,
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const IncomeScreen(),
+                            ),
+                          );
+                        },
+                        child: ActionButton(
+                          icon: Icons.arrow_downward,
+                          text: "Income",
+                          color: Colors.greenAccent,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 20),
-                    InkWell(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (_) => const ExpenseScreen()),
-                        );
-                      },
-                      child: ActionButton(
-                        icon: Icons.arrow_upward,
-                        text: "Expense",
-                        color: Colors.redAccent,
+                  
+                      const SizedBox(width: 12),
+                  
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ExpenseScreen(),
+                            ),
+                          );
+                        },
+                        child: ActionButton(
+                          icon: Icons.arrow_upward,
+                          text: "Expense",
+                          color: Colors.redAccent,
+                        ),
                       ),
-                    ),
-                  ],
+                  
+                      const SizedBox(width: 12),
+                  
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => LendScreen()),
+                          );
+                        },
+                        child: ActionButton(
+                          icon: Icons.call_made,
+                          text: "Lend",
+                          color: Colors.orangeAccent,
+                        ),
+                      ),
+                  
+                      const SizedBox(width: 12),
+                  
+                      InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => BorrowScreen()),
+                          );
+                        },
+                        child: ActionButton(
+                          icon: Icons.call_received,
+                          text: "Borrow",
+                          color: Colors.blueAccent,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -97,21 +137,22 @@ class HomeScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-        
+          // ================= LIST =================
           Expanded(
-            child: Container(
+            child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: vm.notes.isEmpty
                   ? const Center(
                       child: Text(
                         "No transactions yet",
-                        style: TextStyle(color: Colors.grey, fontSize: 16),
+                        style: TextStyle(color: Colors.grey),
                       ),
                     )
                   : ListView.builder(
                       itemCount: vm.notes.length,
                       itemBuilder: (context, index) {
                         final note = vm.notes[index];
+
                         return Container(
                           margin: const EdgeInsets.only(bottom: 12),
                           padding: const EdgeInsets.all(16),
@@ -128,6 +169,7 @@ class HomeScreen extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
+                              // ICON
                               Container(
                                 height: 35,
                                 width: 35,
@@ -138,24 +180,79 @@ class HomeScreen extends StatelessWidget {
                                       : Colors.red[100],
                                 ),
                                 child: Icon(
-                                  note.isIncome
-                                      ? Icons.add
-                                      : Icons.remove,
+                                  note.isIncome ? Icons.add : Icons.remove,
                                   color: note.isIncome
                                       ? Colors.green
                                       : Colors.red,
                                   size: 20,
                                 ),
                               ),
+
                               const SizedBox(width: 12),
+
+                              // TEXT AREA
                               Expanded(
-                                child: Text(
-                                  note.text,
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    // Title + Amount
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          note.title,
+                                          style: const TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                        Text(
+                                          "Rs. ${note.amount}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            color: note.isIncome
+                                                ? Colors.green
+                                                : Colors.red,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+
+                                    const SizedBox(height: 4),
+
+                                    // Small description below
+                                    if (note.description.isNotEmpty)
+                                      Text(
+                                        note.description,
+                                        style: const TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                  ],
                                 ),
+                              ),
+
+                              // EDIT DELETE MENU
+                              PopupMenuButton<String>(
+                                onSelected: (value) {
+                                  if (value == "edit") {
+                                    _showEditDialog(context, vm, index, note);
+                                  } else {
+                                    vm.deleteNote(index);
+                                  }
+                                },
+                                itemBuilder: (context) => const [
+                                  PopupMenuItem(
+                                    value: "edit",
+                                    child: Text("Edit")
+                                  ),
+                                  PopupMenuItem(
+                                    value: "delete",
+                                    child: Text("Delete")
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -163,6 +260,56 @@ class HomeScreen extends StatelessWidget {
                       },
                     ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // ================= EDIT DIALOG =================
+  void _showEditDialog(
+    BuildContext context,
+    BalanceViewModel vm,
+    int index,
+    note,
+  ) {
+    final amountController = TextEditingController(
+      text: note.amount.toString(),
+    );
+    final descController = TextEditingController(text: note.description);
+
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Edit Transaction"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: amountController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: "Amount"),
+            ),
+            TextField(
+              controller: descController,
+              decoration: const InputDecoration(labelText: "Description"),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel"),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              final newAmount = double.tryParse(amountController.text);
+              if (newAmount != null) {
+                vm.editNote(index, newAmount, descController.text);
+                Navigator.pop(context);
+              }
+            },
+            child: const Text("Save"),
           ),
         ],
       ),
