@@ -15,12 +15,16 @@ class BalanceViewModel extends ChangeNotifier {
   double get balance => _balance;
   List<NoteModel> get notes => List.unmodifiable(_notes);
 
-  
   void addIncome(double amount, {String description = ""}) {
     _balance += amount;
     _notes.insert(
       0,
-      NoteModel(title: "Income", description: description, amount: amount, isIncome: true),
+      NoteModel(
+        title: "Income",
+        description: description,
+        amount: amount,
+        isIncome: true,
+      ),
     );
     notifyListeners();
   }
@@ -29,7 +33,12 @@ class BalanceViewModel extends ChangeNotifier {
     _balance -= amount;
     _notes.insert(
       0,
-      NoteModel(title: "Expense", description: description, amount: amount, isIncome: false),
+      NoteModel(
+        title: "Expense",
+        description: description,
+        amount: amount,
+        isIncome: false,
+      ),
     );
     notifyListeners();
   }
@@ -38,7 +47,12 @@ class BalanceViewModel extends ChangeNotifier {
     _balance -= amount;
     _notes.insert(
       0,
-      NoteModel(title: "Lend", description: description, amount: amount, isIncome: false),
+      NoteModel(
+        title: "Lend",
+        description: description,
+        amount: amount,
+        isIncome: false,
+      ),
     );
     notifyListeners();
   }
@@ -47,7 +61,12 @@ class BalanceViewModel extends ChangeNotifier {
     _balance += amount;
     _notes.insert(
       0,
-      NoteModel(title: "Borrow", description: description, amount: amount, isIncome: true),
+      NoteModel(
+        title: "Borrow",
+        description: description,
+        amount: amount,
+        isIncome: true,
+      ),
     );
     notifyListeners();
   }
@@ -87,10 +106,11 @@ class BalanceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> backupData() async {
     final prefs = await SharedPreferences.getInstance();
-    final List<Map<String, dynamic>> notesMap = _notes.map((n) => n.toMap()).toList();
+    final List<Map<String, dynamic>> notesMap = _notes
+        .map((n) => n.toMap())
+        .toList();
     final data = {'balance': _balance, 'notes': notesMap};
     prefs.setString('backup', jsonEncode(data));
   }
@@ -102,18 +122,24 @@ class BalanceViewModel extends ChangeNotifier {
       final data = jsonDecode(dataString);
       _balance = data['balance'];
       _notes.clear();
-      _notes.addAll((data['notes'] as List).map((n) => NoteModel.fromMap(n)).toList());
+      _notes.addAll(
+        (data['notes'] as List).map((n) => NoteModel.fromMap(n)).toList(),
+      );
       notifyListeners();
     }
   }
 
-  
   String exportCSV() {
     final List<List<dynamic>> rows = [
-      ["Title", "Description", "Amount", "Type"]
+      ["Title", "Description", "Amount", "Type"],
     ];
     for (var note in _notes) {
-      rows.add([note.title, note.description, note.amount, note.isIncome ? "Income" : "Expense"]);
+      rows.add([
+        note.title,
+        note.description,
+        note.amount,
+        note.isIncome ? "Income" : "Expense",
+      ]);
     }
     return const ListToCsvConverter().convert(rows);
   }
@@ -135,7 +161,16 @@ class BalanceViewModel extends ChangeNotifier {
             pw.SizedBox(height: 20),
             pw.Table.fromTextArray(
               headers: ["Title", "Description", "Amount", "Type"],
-              data: _notes.map((n) => [n.title, n.description, n.amount.toString(), n.isIncome ? "Income" : "Expense"]).toList(),
+              data: _notes
+                  .map(
+                    (n) => [
+                      n.title,
+                      n.description,
+                      n.amount.toString(),
+                      n.isIncome ? "Income" : "Expense",
+                    ],
+                  )
+                  .toList(),
             ),
           ],
         ),

@@ -47,8 +47,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 16,
+                  ),
                 ),
               ),
               const SizedBox(height: 20),
@@ -66,8 +68,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
                   ),
-                  contentPadding:
-                      const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                  contentPadding: const EdgeInsets.symmetric(
+                    vertical: 16,
+                    horizontal: 16,
+                  ),
                 ),
               ),
               const Spacer(),
@@ -77,9 +81,10 @@ class _IncomeScreenState extends State<IncomeScreen> {
                 final description = descriptionController.text.trim();
 
                 if (amount != null) {
-                  context
-                      .read<BalanceViewModel>()
-                      .addIncome(amount, description: description);
+                  context.read<BalanceViewModel>().addIncome(
+                    amount,
+                    description: description,
+                  );
                   Navigator.pop(context);
                 }
               }),

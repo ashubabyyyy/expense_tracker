@@ -55,9 +55,10 @@ class _LendScreenState extends State<LendScreen> {
                 final description = descriptionController.text.trim();
 
                 if (amount != null) {
-                  context
-                      .read<BalanceViewModel>()
-                      .addLend(amount, description: description);
+                  context.read<BalanceViewModel>().addLend(
+                    amount,
+                    description: description,
+                  );
                   Navigator.pop(context);
                 }
               }),

@@ -19,7 +19,6 @@ class HomeScreen extends StatelessWidget {
       backgroundColor: const Color(0xfff2f2f2),
       body: Column(
         children: [
-          // ================= TOP SECTION (UNCHANGED UI) =================
           Container(
             height: 300,
             width: double.infinity,
@@ -78,9 +77,9 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.greenAccent,
                         ),
                       ),
-                  
+
                       const SizedBox(width: 12),
-                  
+
                       InkWell(
                         onTap: () {
                           Navigator.push(
@@ -96,9 +95,9 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.redAccent,
                         ),
                       ),
-                  
+
                       const SizedBox(width: 12),
-                  
+
                       InkWell(
                         onTap: () {
                           Navigator.push(
@@ -112,9 +111,9 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.orangeAccent,
                         ),
                       ),
-                  
+
                       const SizedBox(width: 12),
-                  
+
                       InkWell(
                         onTap: () {
                           Navigator.push(
@@ -137,7 +136,6 @@ class HomeScreen extends StatelessWidget {
 
           const SizedBox(height: 20),
 
-          // ================= LIST =================
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -169,7 +167,6 @@ class HomeScreen extends StatelessWidget {
                           ),
                           child: Row(
                             children: [
-                              // ICON
                               Container(
                                 height: 35,
                                 width: 35,
@@ -190,12 +187,10 @@ class HomeScreen extends StatelessWidget {
 
                               const SizedBox(width: 12),
 
-                              // TEXT AREA
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    // Title + Amount
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -221,7 +216,6 @@ class HomeScreen extends StatelessWidget {
 
                                     const SizedBox(height: 4),
 
-                                    // Small description below
                                     if (note.description.isNotEmpty)
                                       Text(
                                         note.description,
@@ -234,7 +228,6 @@ class HomeScreen extends StatelessWidget {
                                 ),
                               ),
 
-                              // EDIT DELETE MENU
                               PopupMenuButton<String>(
                                 onSelected: (value) {
                                   if (value == "edit") {
@@ -246,11 +239,11 @@ class HomeScreen extends StatelessWidget {
                                 itemBuilder: (context) => const [
                                   PopupMenuItem(
                                     value: "edit",
-                                    child: Text("Edit")
+                                    child: Text("Edit"),
                                   ),
                                   PopupMenuItem(
                                     value: "delete",
-                                    child: Text("Delete")
+                                    child: Text("Delete"),
                                   ),
                                 ],
                               ),
@@ -266,7 +259,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  // ================= EDIT DIALOG =================
   void _showEditDialog(
     BuildContext context,
     BalanceViewModel vm,

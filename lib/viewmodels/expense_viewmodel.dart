@@ -1,17 +1,12 @@
 import 'package:expense_trackker/model/expense_model.dart';
 import 'package:flutter/material.dart';
 
-
 class ExpenseViewModel extends ChangeNotifier {
   final List<ExpenseModel> _transactions = [];
 
   List<ExpenseModel> get transactions => _transactions;
 
-  void addTransaction(
-    String title,
-    double amount,
-    TransactionType type,
-  ) {
+  void addTransaction(String title, double amount, TransactionType type) {
     _transactions.add(
       ExpenseModel(
         title: title,

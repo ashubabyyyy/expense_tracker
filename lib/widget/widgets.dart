@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 
-
 Widget headerWidget(BuildContext context, String title) {
   return Row(
     children: [
       InkWell(
         onTap: () => Navigator.pop(context),
-        child: const Icon(
-          Icons.arrow_back_ios,
-          color: Colors.white,
-        ),
+        child: const Icon(Icons.arrow_back_ios, color: Colors.white),
       ),
       const Spacer(),
       Text(
@@ -35,11 +31,7 @@ Widget continueButton(VoidCallback onTap) {
         borderRadius: BorderRadius.circular(15),
         color: const Color(0xff5BC500).withOpacity(0.8),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3)),
         ],
       ),
       child: const Center(
@@ -56,7 +48,6 @@ Widget continueButton(VoidCallback onTap) {
   );
 }
 
-
 Widget actionButton({
   required IconData icon,
   required String text,
@@ -72,11 +63,7 @@ Widget actionButton({
         color: const Color(0xff2A2A2A),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 5,
-            offset: Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 5, offset: Offset(0, 3)),
         ],
       ),
       child: Row(
@@ -97,8 +84,6 @@ Widget actionButton({
     ),
   );
 }
-
-
 
 class ActionButton extends StatelessWidget {
   final IconData icon;
@@ -121,11 +106,7 @@ class ActionButton extends StatelessWidget {
         color: const Color(0xff2A2A2A),
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
+          BoxShadow(color: Colors.black26, blurRadius: 6, offset: Offset(0, 3)),
         ],
       ),
       child: Row(
