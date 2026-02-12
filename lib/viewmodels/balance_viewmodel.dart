@@ -5,7 +5,7 @@ import '../model/notes_model.dart';
 import 'package:csv/csv.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
+
 import 'package:pdf/widgets.dart' as pw;
 
 class BalanceViewModel extends ChangeNotifier {
@@ -15,7 +15,7 @@ class BalanceViewModel extends ChangeNotifier {
   double get balance => _balance;
   List<NoteModel> get notes => List.unmodifiable(_notes);
 
-  // ================= TRANSACTIONS =================
+  
   void addIncome(double amount, {String description = ""}) {
     _balance += amount;
     _notes.insert(
@@ -87,7 +87,7 @@ class BalanceViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  // ================= BACKUP / RESTORE =================
+
   Future<void> backupData() async {
     final prefs = await SharedPreferences.getInstance();
     final List<Map<String, dynamic>> notesMap = _notes.map((n) => n.toMap()).toList();
@@ -107,7 +107,7 @@ class BalanceViewModel extends ChangeNotifier {
     }
   }
 
-  // ================= EXPORT =================
+  
   String exportCSV() {
     final List<List<dynamic>> rows = [
       ["Title", "Description", "Amount", "Type"]
