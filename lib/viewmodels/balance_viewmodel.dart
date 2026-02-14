@@ -5,7 +5,6 @@ import '../model/notes_model.dart';
 import 'package:csv/csv.dart';
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:pdf/widgets.dart' as pw;
 
 class BalanceViewModel extends ChangeNotifier {
@@ -15,8 +14,63 @@ class BalanceViewModel extends ChangeNotifier {
   double get balance => _balance;
   List<NoteModel> get notes => List.unmodifiable(_notes);
 
+  ////////////////////////////////////////////////////////////
+  /// AUTO RESTORE WHEN APP STARTS
+  ////////////////////////////////////////////////////////////
+
+  BalanceViewModel() {
+    restoreData();
+  }
+
+  ////////////////////////////////////////////////////////////
+  /// AUTO BACKUP METHOD
+  ////////////////////////////////////////////////////////////
+
+  Future<void> _autoBackup() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final List<Map<String, dynamic>> notesMap =
+        _notes.map((n) => n.toMap()).toList();
+
+    final data = {
+      'balance': _balance,
+      'notes': notesMap,
+    };
+
+    await prefs.setString('backup', jsonEncode(data));
+  }
+
+  ////////////////////////////////////////////////////////////
+  /// RESTORE METHOD
+  ////////////////////////////////////////////////////////////
+
+  Future<void> restoreData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final dataString = prefs.getString('backup');
+
+    if (dataString != null) {
+      final data = jsonDecode(dataString);
+
+      _balance = (data['balance'] as num).toDouble();
+
+      _notes.clear();
+      _notes.addAll(
+        (data['notes'] as List)
+            .map((n) => NoteModel.fromMap(Map<String, dynamic>.from(n)))
+            .toList(),
+      );
+
+      notifyListeners();
+    }
+  }
+
+  ////////////////////////////////////////////////////////////
+  /// ADD INCOME
+  ////////////////////////////////////////////////////////////
+
   void addIncome(double amount, {String description = ""}) {
     _balance += amount;
+
     _notes.insert(
       0,
       NoteModel(
@@ -26,11 +80,18 @@ class BalanceViewModel extends ChangeNotifier {
         isIncome: true,
       ),
     );
+
+    _autoBackup();   // 🔥 AUTO SAVE
     notifyListeners();
   }
 
+  ////////////////////////////////////////////////////////////
+  /// ADD EXPENSE
+  ////////////////////////////////////////////////////////////
+
   void addExpense(double amount, {String description = ""}) {
     _balance -= amount;
+
     _notes.insert(
       0,
       NoteModel(
@@ -40,11 +101,18 @@ class BalanceViewModel extends ChangeNotifier {
         isIncome: false,
       ),
     );
+
+    _autoBackup();   // 🔥 AUTO SAVE
     notifyListeners();
   }
 
+  ////////////////////////////////////////////////////////////
+  /// ADD LEND
+  ////////////////////////////////////////////////////////////
+
   void addLend(double amount, {String description = ""}) {
     _balance -= amount;
+
     _notes.insert(
       0,
       NoteModel(
@@ -54,11 +122,18 @@ class BalanceViewModel extends ChangeNotifier {
         isIncome: false,
       ),
     );
+
+    _autoBackup();   // 🔥 AUTO SAVE
     notifyListeners();
   }
 
+  ////////////////////////////////////////////////////////////
+  /// ADD BORROW
+  ////////////////////////////////////////////////////////////
+
   void addBorrow(double amount, {String description = ""}) {
     _balance += amount;
+
     _notes.insert(
       0,
       NoteModel(
@@ -68,19 +143,33 @@ class BalanceViewModel extends ChangeNotifier {
         isIncome: true,
       ),
     );
+
+    _autoBackup();   // 🔥 AUTO SAVE
     notifyListeners();
   }
 
+  ////////////////////////////////////////////////////////////
+  /// DELETE
+  ////////////////////////////////////////////////////////////
+
   void deleteNote(int index) {
     final note = _notes[index];
+
     if (note.isIncome) {
       _balance -= note.amount;
     } else {
       _balance += note.amount;
     }
+
     _notes.removeAt(index);
+
+    _autoBackup();   // 🔥 AUTO SAVE
     notifyListeners();
   }
+
+  ////////////////////////////////////////////////////////////
+  /// EDIT
+  ////////////////////////////////////////////////////////////
 
   void editNote(int index, double newAmount, String newDescription) {
     final oldNote = _notes[index];
@@ -103,36 +192,20 @@ class BalanceViewModel extends ChangeNotifier {
       amount: newAmount,
       isIncome: oldNote.isIncome,
     );
+
+    _autoBackup();   // 🔥 AUTO SAVE
     notifyListeners();
   }
 
-  Future<void> backupData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final List<Map<String, dynamic>> notesMap = _notes
-        .map((n) => n.toMap())
-        .toList();
-    final data = {'balance': _balance, 'notes': notesMap};
-    prefs.setString('backup', jsonEncode(data));
-  }
-
-  Future<void> restoreData() async {
-    final prefs = await SharedPreferences.getInstance();
-    final dataString = prefs.getString('backup');
-    if (dataString != null) {
-      final data = jsonDecode(dataString);
-      _balance = data['balance'];
-      _notes.clear();
-      _notes.addAll(
-        (data['notes'] as List).map((n) => NoteModel.fromMap(n)).toList(),
-      );
-      notifyListeners();
-    }
-  }
+  ////////////////////////////////////////////////////////////
+  /// CSV EXPORT (UNCHANGED)
+  ////////////////////////////////////////////////////////////
 
   String exportCSV() {
     final List<List<dynamic>> rows = [
       ["Title", "Description", "Amount", "Type"],
     ];
+
     for (var note in _notes) {
       rows.add([
         note.title,
@@ -141,6 +214,7 @@ class BalanceViewModel extends ChangeNotifier {
         note.isIncome ? "Income" : "Expense",
       ]);
     }
+
     return const ListToCsvConverter().convert(rows);
   }
 
@@ -151,13 +225,19 @@ class BalanceViewModel extends ChangeNotifier {
     await file.writeAsString(csvData);
   }
 
+  ////////////////////////////////////////////////////////////
+  /// PDF EXPORT (UNCHANGED)
+  ////////////////////////////////////////////////////////////
+
   Future<void> exportPDF() async {
     final pdf = pw.Document();
+
     pdf.addPage(
       pw.Page(
         build: (context) => pw.Column(
           children: [
-            pw.Text("Transaction History", style: pw.TextStyle(fontSize: 20)),
+            pw.Text("Transaction History",
+                style: pw.TextStyle(fontSize: 20)),
             pw.SizedBox(height: 20),
             pw.Table.fromTextArray(
               headers: ["Title", "Description", "Amount", "Type"],
@@ -176,6 +256,7 @@ class BalanceViewModel extends ChangeNotifier {
         ),
       ),
     );
+
     final dir = await getApplicationDocumentsDirectory();
     final file = File('${dir.path}/transaction_history.pdf');
     await file.writeAsBytes(await pdf.save());
