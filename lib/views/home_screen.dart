@@ -2,11 +2,14 @@ import 'package:expense_trackker/views/borrow_screen.dart';
 import 'package:expense_trackker/views/lend_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import '../viewmodels/balance_viewmodel.dart';
 import '../income/income_screen.dart';
 import '../expense/expense_screen.dart';
-
 import '../widget/widgets.dart';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -43,9 +46,7 @@ class HomeScreen extends StatelessWidget {
                   "Current Balance",
                   style: TextStyle(color: Colors.white70, fontSize: 18),
                 ),
-
                 const SizedBox(height: 10),
-
                 Text(
                   "Rs. ${vm.balance.toStringAsFixed(0)}",
                   style: const TextStyle(
@@ -54,9 +55,7 @@ class HomeScreen extends StatelessWidget {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-
                 const SizedBox(height: 30),
-
                 SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
@@ -77,9 +76,7 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.greenAccent,
                         ),
                       ),
-
                       const SizedBox(width: 12),
-
                       InkWell(
                         onTap: () {
                           Navigator.push(
@@ -95,14 +92,12 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.redAccent,
                         ),
                       ),
-
                       const SizedBox(width: 12),
-
                       InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => LendScreen()),
+                            MaterialPageRoute(builder: (_) => const LendScreen()),
                           );
                         },
                         child: ActionButton(
@@ -111,14 +106,12 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.orangeAccent,
                         ),
                       ),
-
                       const SizedBox(width: 12),
-
                       InkWell(
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (_) => BorrowScreen()),
+                            MaterialPageRoute(builder: (_) => const BorrowScreen()),
                           );
                         },
                         child: ActionButton(
@@ -127,15 +120,26 @@ class HomeScreen extends StatelessWidget {
                           color: Colors.blueAccent,
                         ),
                       ),
+                      const SizedBox(width: 12),
+                      InkWell(
+                        onTap: () async {
+                          final file = await _exportPDF(vm);
+                          await Share.shareFiles([file.path],
+                              text: "Transaction History PDF");
+                        },
+                        child: ActionButton(
+                          icon: Icons.picture_as_pdf,
+                          text: "Share PDF",
+                          color: Colors.purpleAccent,
+                        ),
+                      ),
                     ],
                   ),
                 ),
               ],
             ),
           ),
-
           const SizedBox(height: 20),
-
           Expanded(
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -178,15 +182,12 @@ class HomeScreen extends StatelessWidget {
                                 ),
                                 child: Icon(
                                   note.isIncome ? Icons.add : Icons.remove,
-                                  color: note.isIncome
-                                      ? Colors.green
-                                      : Colors.red,
+                                  color:
+                                      note.isIncome ? Colors.green : Colors.red,
                                   size: 20,
                                 ),
                               ),
-
                               const SizedBox(width: 12),
-
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,9 +214,7 @@ class HomeScreen extends StatelessWidget {
                                         ),
                                       ],
                                     ),
-
                                     const SizedBox(height: 4),
-
                                     if (note.description.isNotEmpty)
                                       Text(
                                         note.description,
@@ -227,7 +226,6 @@ class HomeScreen extends StatelessWidget {
                                   ],
                                 ),
                               ),
-
                               PopupMenuButton<String>(
                                 onSelected: (value) {
                                   if (value == "edit") {
@@ -260,14 +258,8 @@ class HomeScreen extends StatelessWidget {
   }
 
   void _showEditDialog(
-    BuildContext context,
-    BalanceViewModel vm,
-    int index,
-    note,
-  ) {
-    final amountController = TextEditingController(
-      text: note.amount.toString(),
-    );
+      BuildContext context, BalanceViewModel vm, int index, note) {
+    final amountController = TextEditingController(text: note.amount.toString());
     final descController = TextEditingController(text: note.description);
 
     showDialog(
@@ -306,5 +298,35 @@ class HomeScreen extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  Future<File> _exportPDF(BalanceViewModel vm) async {
+    final pdf = pw.Document();
+    pdf.addPage(
+      pw.Page(
+        build: (context) => pw.Column(
+          children: [
+            pw.Text("Transaction History", style: pw.TextStyle(fontSize: 20)),
+            pw.SizedBox(height: 20),
+            pw.Table.fromTextArray(
+              headers: ["Title", "Description", "Amount", "Type"],
+              data: vm.notes
+                  .map((n) => [
+                        n.title,
+                        n.description,
+                        n.amount.toString(),
+                        n.isIncome ? "Income" : "Expense",
+                      ])
+                  .toList(),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    final dir = await getApplicationDocumentsDirectory();
+    final file = File('${dir.path}/transaction_history.pdf');
+    await file.writeAsBytes(await pdf.save());
+    return file;
   }
 }
